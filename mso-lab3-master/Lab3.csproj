@@ -48,5 +48,10 @@
     <Compile Include="Card.cs" />
     <Compile Include="CoinMachine.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI.resx">
+      <DependentUpon>UI.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
