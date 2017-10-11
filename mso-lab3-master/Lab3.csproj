@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{56017FCA-376C-4D31-BD98-7CC6BB858079}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Lab3</RootNamespace>
     <AssemblyName>Lab3</AssemblyName>
   </PropertyGroup>
@@ -37,20 +37,20 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Betaalmethode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI.cs">
+    <Compile Include="Automaat.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Tariefeenheden.cs" />
-    <Compile Include="UIInfo.cs" />
-    <Compile Include="PricingTable.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="Bestelling.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CoinMachine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI.resx">
-      <DependentUpon>UI.cs</DependentUpon>
+    <EmbeddedResource Include="Automaat.resx">
+      <DependentUpon>Automaat.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

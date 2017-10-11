@@ -13,7 +13,7 @@ namespace Lab3
 	}
 
 	// Mock CreditCard implementation
-	public class CreditCard : ICard
+	/*public class CreditCard : ICard
 	{
 		public void Connect ()
 		{
@@ -84,6 +84,6 @@ namespace Lab3
 
 			MessageBox.Show("Cancel transaction 1");
 		}
-	}
+	}*/
 }
 

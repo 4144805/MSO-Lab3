@@ -28,7 +28,7 @@ namespace Lab3
 		Cash
 	}
 
-	public struct UIInfo
+	public struct Bestelling
 	{
 		string from, to;
 		UIClass cls;
@@ -36,7 +36,7 @@ namespace Lab3
 		UIDiscount discount;
 		UIPayment payment;
 
-		public UIInfo (string from, string to, UIClass cls, UIWay way, UIDiscount discount, UIPayment payment)
+		public Bestelling (string from, string to, UIClass cls, UIWay way, UIDiscount discount, UIPayment payment)
 		{
 			this.from = from;
 			this.to = to;

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace Lab3
 {
-	public class UI : Form
+	public class Automaat : Form
 	{
 		ComboBox fromBox;
 		ComboBox toBox;
@@ -18,19 +18,18 @@ namespace Lab3
 		ComboBox payment;
 		Button pay;
 
-		public UI ()
+		public Automaat ()
 		{
 			initializeControls ();
 		}
 
-		private void handlePayment(UIInfo info)
+		private void handlePayment(Bestelling info)
 		{
 			// *************************************
 			// This is the code you need to refactor
 			// *************************************
 
 			// Get number of tariefeenheden
-			int tariefeenheden = Tariefeenheden.getTariefeenheden (info.From, info.To);
 
 			// Compute the column in the table based on choices
 			int tableColumn;
@@ -54,7 +53,7 @@ namespace Lab3
 			}
 
 			// Get price
-			float price = PricingTable.getPrice (tariefeenheden, tableColumn);
+			float price = Database.getPrice (info.From, info.To, tableColumn);
 			if (info.Way == UIWay.Return) {
 				price *= 2;
 			}
@@ -63,31 +62,49 @@ namespace Lab3
 				price += 0.50f;
 			}
 
-			// Pay
-			switch (info.Payment) {
-			case UIPayment.CreditCard:
-				CreditCard c = new CreditCard ();
-				c.Connect ();
-				int ccid = c.BeginTransaction (price);
-				c.EndTransaction (ccid);
-				break;
-			case UIPayment.DebitCard:
-				DebitCard d = new DebitCard ();
-				d.Connect ();
-				int dcid = d.BeginTransaction (price);
-				d.EndTransaction (dcid);
-				break;
-			case UIPayment.Cash:
-				IKEAMyntAtare2000 coin = new IKEAMyntAtare2000 ();
-				coin.starta ();
-				coin.betala ((int) Math.Round(price * 100));
-				coin.stoppa ();
-				break;
-			}
-		}
+            // Pay
+            //Betaalmethode betaling = new Lab3.Betaalmethode(info.Payment);
+            IBetaal betaalduckkdig = new CreditCard();
+            switch (info.Payment)
+            {
+                case UIPayment.CreditCard:
+                    betaalduckkdig = new CreditCard();
+                    break;
+                case UIPayment.DebitCard:
+                    betaalduckkdig = new DebitCard();
+                    break;
+                case UIPayment.Cash:
+                    betaalduckkdig = new CashBetaal();
+                    break;
+            }
+            betaalduckkdig.Connect();
+            int id = betaalduckkdig.BeginTransaction(price);
+            betaalduckkdig.EndTransaction(id);
 
-#region Set-up -- don't look at it
-		private void initializeControls()
+            /*switch (info.Payment) {
+    case UIPayment.CreditCard:
+        CreditCard c = new CreditCard ();
+        c.Connect ();
+        int ccid = c.BeginTransaction (price);
+        c.EndTransaction (ccid);
+        break;
+    case UIPayment.DebitCard:
+        DebitCard d = new DebitCard ();
+        d.Connect ();
+        int dcid = d.BeginTransaction (price);
+        d.EndTransaction (dcid);
+        break;
+    case UIPayment.Cash:
+        IKEAMyntAtare2000 coin = new IKEAMyntAtare2000 ();
+        coin.starta ();
+        coin.betala ((int) Math.Round(price * 100));
+        coin.stoppa ();
+        break;
+    }*/
+        }
+
+        #region Set-up -- don't look at it
+        private void initializeControls()
 		{
 			// Set label
 			this.Text = "MSO Lab Exercise III";
@@ -118,7 +135,7 @@ namespace Lab3
 			fromLabel.Dock = DockStyle.Fill;
 			fromBox = new ComboBox ();
 			fromBox.DropDownStyle = ComboBoxStyle.DropDownList;
-			fromBox.Items.AddRange (Tariefeenheden.getStations ());
+			fromBox.Items.AddRange (Database.getStations ());
 			fromBox.SelectedIndex = 0;
 			grid.Controls.Add (fromBox, 1, 0);
 			grid.SetColumnSpan (fromBox, 2);
@@ -130,7 +147,7 @@ namespace Lab3
 			toLabel.Dock = DockStyle.Fill;
 			toBox = new ComboBox ();
 			toBox.DropDownStyle = ComboBoxStyle.DropDownList;
-			toBox.Items.AddRange (Tariefeenheden.getStations ());
+			toBox.Items.AddRange (Database.getStations ());
 			toBox.SelectedIndex = 0;
 			grid.Controls.Add (toBox, 4, 0);
 			grid.SetColumnSpan (toBox, 2);
@@ -215,7 +232,7 @@ namespace Lab3
 			pay.Click += (object sender, EventArgs e) => handlePayment(getUIInfo());
 		}
 
-		private UIInfo getUIInfo()
+		private Bestelling getUIInfo()
 		{
 			UIClass cls;
 			if (firstClass.Checked)
@@ -250,7 +267,7 @@ namespace Lab3
 				break;
 			}
 
-			return new UIInfo ((string)fromBox.SelectedItem,
+			return new Bestelling ((string)fromBox.SelectedItem,
 				(string)toBox.SelectedItem,
 				cls, way, dis, pment);
 		}

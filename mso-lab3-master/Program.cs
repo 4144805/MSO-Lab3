@@ -8,7 +8,7 @@ namespace Lab3
 		[STAThread]
 		public static void Main (string[] args)
 		{
-			var ui = new UI ();
+			var ui = new Automaat ();
 			Application.Run (ui);
 		}
 	}

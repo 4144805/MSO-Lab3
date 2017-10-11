@@ -2,7 +2,7 @@
 
 namespace Lab3
 {
-	public static class Tariefeenheden
+	public static class Database
 	{
 		public static String[] getStations()
 		{
@@ -17,7 +17,40 @@ namespace Lab3
 			};
 		}
 
-		public static int getTariefeenheden(String from, String to) 
+        public static float getPrice(String from, String to, int col)
+        {
+            double price = 0;
+
+            switch (col)
+            {
+                case 0:
+                    price = 2.10;
+                    break;
+                case 1:
+                    price = 1.70;
+                    break;
+                case 2:
+                    price = 1.30;
+                    break;
+                case 3:
+                    price = 3.60;
+                    break;
+                case 4:
+                    price = 2.90;
+                    break;
+                case 5:
+                    price = 2.20;
+                    break;
+                default:
+                    throw new Exception("Unknown column number");
+            }
+
+            price = price * 0.02 * getTariefeenheden(from, to);
+
+            return (float)Math.Round(price, 2);
+        }
+
+        public static int getTariefeenheden(String from, String to) 
 		{
 			switch (from) {
 			case "Utrecht Centraal":
