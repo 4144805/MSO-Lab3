@@ -35,8 +35,9 @@ namespace Lab3
 		UIWay way;
 		UIDiscount discount;
 		UIPayment payment;
+        int aantalKaartjes;
 
-		public Bestelling (string from, string to, UIClass cls, UIWay way, UIDiscount discount, UIPayment payment)
+        public Bestelling (string from, string to, UIClass cls, UIWay way, UIDiscount discount, UIPayment payment, int aantalKaartjes)
 		{
 			this.from = from;
 			this.to = to;
@@ -44,6 +45,7 @@ namespace Lab3
 			this.way = way;
 			this.discount = discount;
 			this.payment = payment;
+            this.aantalKaartjes = aantalKaartjes;
 		}
 
 		public string From {
@@ -81,6 +83,14 @@ namespace Lab3
 				return payment;
 			}
 		}
+
+        public int AantalKaartjes
+        {
+            get
+            {
+                return aantalKaartjes;
+            }
+        }
 	}
 }
 

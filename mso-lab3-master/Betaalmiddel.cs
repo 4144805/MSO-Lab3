@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lab3
 {
-    public interface IBetaal
+    public interface IBetaalmiddel
     {
         void Connect();
         void Disconnect();
@@ -16,7 +16,7 @@ namespace Lab3
     }
 
     // Mock CreditCard implementation
-    public class CreditCard : IBetaal
+    public class CreditCard : IBetaalmiddel
     {
         public void Connect()
         {
@@ -53,7 +53,7 @@ namespace Lab3
     }
 
     // Mock CreditCard implementation
-    public class DebitCard : IBetaal
+    public class DebitCard : IBetaalmiddel
     {
         public void Connect()
         {
@@ -90,123 +90,35 @@ namespace Lab3
     }
 
     // Mock Cash implementation
-    public class CashBetaal : IBetaal
+    public class Cash : IBetaalmiddel
     {
+        IKEAMyntAtare2000 muntmachine = new IKEAMyntAtare2000();
         public void Connect()
         {
-            MessageBox.Show("Welkom");
+            muntmachine.starta();
         }
 
         public void Disconnect()
         {
-            MessageBox.Show("Afsluiten");
+            muntmachine.stoppa();
         }
 
         public int BeginTransaction(float amount)
         {
-            MessageBox.Show("Betaal nu gelijk fucking " + amount + " EUR");
+            int centen = (int)Math.Floor(amount * 100);
+            muntmachine.betala(centen);
             return 1;
         }
 
         public bool EndTransaction(int id)
         {
-            MessageBox.Show("Doei");
+            muntmachine.stoppa();
             return true;
         }
 
         public void CancelTransaction(int id)
         {
-            
-        }
-    }
-
-    public class Betaalmethode
-    {
-        BetaalmethodeB kind;//verander deze naam nog
-        public Betaalmethode(UIPayment betaling)
-        {
-            if (betaling == UIPayment.Cash)
-            {
-                kind = new CashBetaling(betaling);
-            }
-            else
-            {
-                kind = new KaartBetaling(betaling);
-            }
-        }
-    }
-
-    public class BetaalmethodeB
-    {
-        public BetaalmethodeB(UIPayment betaling) 
-        {
-
-        }
-    }
-
-    public class KaartBetaling : BetaalmethodeB
-    {
-        UIPayment betaling;
-
-        public KaartBetaling(UIPayment betaling) : base(betaling)
-        {
-            this.betaling = betaling;
-        }
-
-        public void Connect()
-        {
-            MessageBox.Show("Aan het verbinden met " + betaling + "-lezer");
-        }
-
-        public void Disconnect()
-        {
-            MessageBox.Show("Disconnecting from " + betaling + "-lezer");
-        }
-
-        public int BeginTransaction(float prijs)
-        {
-            MessageBox.Show("Begin transaction 1 of " + prijs + " EUR");
-            return 1;
-        }
-
-        public bool EndTransaction(int id)
-        {
-            if (id != 1)
-                return false;
-
-            MessageBox.Show("End transaction 1");
-            return true;
-        }
-
-        public void CancelTransaction(int id)
-        {
-            if (id != 1)
-                throw new Exception("Incorrect transaction id");
-
-            MessageBox.Show("Cancel transaction 1");
-        }
-    }
-
-    public class CashBetaling : BetaalmethodeB
-    {
-        public CashBetaling(UIPayment betaling) : base(betaling)
-        {
-
-        }
-
-        public void starta()
-        {
-            MessageBox.Show("Welkom");
-        }
-
-        public void stoppa()
-        {
-            MessageBox.Show("Tot ziens!");
-        }
-
-        public void betala(int prijs)
-        {
-            MessageBox.Show("€" + prijs);
+            muntmachine.stoppa();
         }
     }
 }

@@ -17,90 +17,79 @@ namespace Lab3
 		RadioButton fortyDiscount;
 		ComboBox payment;
 		Button pay;
+        ComboBox aantalKaartjes;
 
 		public Automaat ()
 		{
 			initializeControls ();
-		}
+        }
 
-		private void handlePayment(Bestelling info)
-		{
-			// *************************************
-			// This is the code you need to refactor
-			// *************************************
+        private void handlePayment(Bestelling info)
+        {
+            // Bereken de prijs.
+            float prijs = berekenPrijs(info);
 
-			// Get number of tariefeenheden
+            // Betaal.
+            betaal(info.Payment, prijs);
+        }
 
-			// Compute the column in the table based on choices
-			int tableColumn;
-			// First based on class
-			switch (info.Class) {
-			case UIClass.FirstClass:
-				tableColumn = 3;
-				break;
-			default:
-				tableColumn = 0;
-				break;
-			}
-			// Then, on the discount
-			switch (info.Discount) {
-			case UIDiscount.TwentyDiscount:
-				tableColumn += 1;
-				break;
-			case UIDiscount.FortyDiscount:
-				tableColumn += 2;
-				break;
-			}
+        private float berekenPrijs(Bestelling info)
+        {
+            // Get number of tariefeenheden
 
-			// Get price
-			float price = Database.getPrice (info.From, info.To, tableColumn);
-			if (info.Way == UIWay.Return) {
-				price *= 2;
-			}
-			// Add 50 cent if paying with credit card
-			if (info.Payment == UIPayment.CreditCard) {
-				price += 0.50f;
-			}
-
-            // Pay
-            //Betaalmethode betaling = new Lab3.Betaalmethode(info.Payment);
-            IBetaal betaalduckkdig = new CreditCard();
-            switch (info.Payment)
+            // We berekenen eerst in welke kolom van de database we moeten kijken aan de hand van de ingevulde keuzes.
+            int tableColumn;
+            // We kijken welke klasse is geselecteerd.
+            switch (info.Class)
             {
-                case UIPayment.CreditCard:
-                    betaalduckkdig = new CreditCard();
+                case UIClass.FirstClass:
+                    tableColumn = 3;
                     break;
-                case UIPayment.DebitCard:
-                    betaalduckkdig = new DebitCard();
-                    break;
-                case UIPayment.Cash:
-                    betaalduckkdig = new CashBetaal();
+                default:
+                    tableColumn = 0;
                     break;
             }
-            betaalduckkdig.Connect();
-            int id = betaalduckkdig.BeginTransaction(price);
-            betaalduckkdig.EndTransaction(id);
+            // Kijk of er korting is geselecteerd.
+            switch (info.Discount)
+            {
+                case UIDiscount.TwentyDiscount:
+                    tableColumn += 1;
+                    break;
+                case UIDiscount.FortyDiscount:
+                    tableColumn += 2;
+                    break;
+            }
 
-            /*switch (info.Payment) {
-    case UIPayment.CreditCard:
-        CreditCard c = new CreditCard ();
-        c.Connect ();
-        int ccid = c.BeginTransaction (price);
-        c.EndTransaction (ccid);
-        break;
-    case UIPayment.DebitCard:
-        DebitCard d = new DebitCard ();
-        d.Connect ();
-        int dcid = d.BeginTransaction (price);
-        d.EndTransaction (dcid);
-        break;
-    case UIPayment.Cash:
-        IKEAMyntAtare2000 coin = new IKEAMyntAtare2000 ();
-        coin.starta ();
-        coin.betala ((int) Math.Round(price * 100));
-        coin.stoppa ();
-        break;
-    }*/
+            // Haal de prijs op uit de database.
+            float price = Database.getPrice(info.From, info.To, tableColumn);
+            if (info.Way == UIWay.Return)
+            {
+                price *= 2;
+            }
+            price *= info.AantalKaartjes;
+
+            return price;
+        }
+
+        private void betaal(UIPayment betaalmiddel, float prijs)
+        {
+            IBetaalmiddel fysiekBetaalmiddel = new CreditCard(); // Initialiseer betaalmiddel als CreditCard, anders mogen we geen methodes ervan aanroepen.
+            switch (betaalmiddel)
+            {
+                case UIPayment.CreditCard:
+                    prijs += 0.50f;
+                    fysiekBetaalmiddel = new CreditCard();
+                    break;
+                case UIPayment.DebitCard:
+                    fysiekBetaalmiddel = new DebitCard();
+                    break;
+                case UIPayment.Cash:
+                    fysiekBetaalmiddel = new Cash();
+                    break;
+            }
+            fysiekBetaalmiddel.Connect();
+            int id = fysiekBetaalmiddel.BeginTransaction(prijs);
+            fysiekBetaalmiddel.EndTransaction(id);
         }
 
         #region Set-up -- don't look at it
@@ -116,13 +105,13 @@ namespace Lab3
 			grid.Dock = DockStyle.Fill;
 			grid.Padding = new Padding (5);
 			this.Controls.Add (grid);
-			grid.RowCount = 4;
+			grid.RowCount = 4; 
 			grid.RowStyles.Add (new RowStyle (SizeType.Absolute, 20));
 			grid.RowStyles.Add (new RowStyle (SizeType.Percent, 100));
 			grid.RowStyles.Add (new RowStyle (SizeType.Absolute, 20));
 			grid.RowStyles.Add (new RowStyle (SizeType.Absolute, 40));
-			grid.ColumnCount = 6;
-			for (int i = 0; i < 6; i++)
+            grid.ColumnCount = 7;
+			for (int i = 0; i < 7; i++)
 			{
 				ColumnStyle c = new ColumnStyle (SizeType.Percent, 16.66666f);
 				grid.ColumnStyles.Add (c);
@@ -140,6 +129,7 @@ namespace Lab3
 			grid.Controls.Add (fromBox, 1, 0);
 			grid.SetColumnSpan (fromBox, 2);
 			fromBox.Dock = DockStyle.Fill;
+
 			var toLabel = new Label ();
 			toLabel.Text = "To:";
 			toLabel.TextAlign = ContentAlignment.MiddleRight;
@@ -152,8 +142,35 @@ namespace Lab3
 			grid.Controls.Add (toBox, 4, 0);
 			grid.SetColumnSpan (toBox, 2);
 			toBox.Dock = DockStyle.Fill;
-			// Create groups
-			GroupBox classGroup = new GroupBox ();
+
+            
+            //test
+            var aantalKaartjesLabel = new Label();
+            aantalKaartjesLabel.Text = "Aantal kaartjes:";
+            aantalKaartjesLabel.TextAlign = ContentAlignment.BottomRight;
+            grid.Controls.Add(aantalKaartjesLabel, 5, 1);
+            aantalKaartjesLabel.Dock = DockStyle.Fill;
+            aantalKaartjes = new ComboBox();
+            aantalKaartjes.DropDownStyle = ComboBoxStyle.DropDownList;
+            aantalKaartjes.Items.AddRange(
+                new String[] {
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            }
+                );
+            aantalKaartjes.SelectedIndex = 0;
+            grid.Controls.Add(aantalKaartjes, 5, 2);
+            grid.SetColumnSpan(aantalKaartjes, 1);
+            aantalKaartjes.Dock = DockStyle.Fill;
+            //test
+            
+
+            // Create groups
+            GroupBox classGroup = new GroupBox ();
 			classGroup.Text = "Class";
 			classGroup.Dock = DockStyle.Fill;
 			grid.Controls.Add (classGroup, 0, 1);
@@ -163,6 +180,7 @@ namespace Lab3
 			classGrid.RowStyles.Add (new RowStyle (SizeType.Percent, 50));
 			classGrid.Dock = DockStyle.Fill;
 			classGroup.Controls.Add (classGrid);
+
 			GroupBox wayGroup = new GroupBox ();
 			wayGroup.Text = "Amount";
 			wayGroup.Dock = DockStyle.Fill;
@@ -173,6 +191,7 @@ namespace Lab3
 			wayGrid.RowStyles.Add (new RowStyle (SizeType.Percent, 50));
 			wayGrid.Dock = DockStyle.Fill;
 			wayGroup.Controls.Add (wayGrid);
+
 			GroupBox discountGroup = new GroupBox ();
 			discountGroup.Text = "Discount";
 			discountGroup.Dock = DockStyle.Fill;
@@ -184,6 +203,7 @@ namespace Lab3
 			discountGrid.RowStyles.Add (new RowStyle (SizeType.Percent, 33.33333f));
 			discountGrid.Dock = DockStyle.Fill;
 			discountGroup.Controls.Add (discountGrid);
+
 			// Create radio buttons
 			firstClass = new RadioButton ();
 			firstClass.Text = "1st class";
@@ -209,6 +229,7 @@ namespace Lab3
 			fortyDiscount = new RadioButton ();
 			fortyDiscount.Text = "40% discount";
 			discountGrid.Controls.Add (fortyDiscount);
+
 			// Payment option
 			Label paymentLabel = new Label ();
 			paymentLabel.Text = "Payment by:";
@@ -222,12 +243,14 @@ namespace Lab3
 			payment.Dock = DockStyle.Fill;
 			grid.Controls.Add (payment, 1, 2);
 			grid.SetColumnSpan (payment, 5);
+
 			// Pay button
 			pay = new Button ();
 			pay.Text = "Pay";
 			pay.Dock = DockStyle.Fill;
 			grid.Controls.Add (pay, 0, 3);
 			grid.SetColumnSpan (pay, 6);
+
 			// Set up event
 			pay.Click += (object sender, EventArgs e) => handlePayment(getUIInfo());
 		}
@@ -254,6 +277,9 @@ namespace Lab3
 			else
 				dis = UIDiscount.FortyDiscount;
 
+            int aantal = Convert.ToInt32(aantalKaartjes.SelectedItem);
+            
+
 			UIPayment pment;
 			switch ((string)payment.SelectedItem) {
 			case "Credit card":
@@ -269,7 +295,7 @@ namespace Lab3
 
 			return new Bestelling ((string)fromBox.SelectedItem,
 				(string)toBox.SelectedItem,
-				cls, way, dis, pment);
+				cls, way, dis, pment, aantal);
 		}
 #endregion
 	}
