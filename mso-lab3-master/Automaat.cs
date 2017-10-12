@@ -30,7 +30,16 @@ namespace Lab3
             float prijs = berekenPrijs(info);
 
             // Betaal.
-            betaal(info.Payment, prijs);
+            bool betaling = betaal(info.Payment, prijs);
+
+            // Als de betaling gelukt is, print het kaartje.
+            if (betaling)
+            {
+                for (int i = 0; i < info.AantalKaartjes; i++)
+                {
+                    printKaartje(info);
+                }
+            }
         }
 
         private float berekenPrijs(Bestelling info)
@@ -71,7 +80,7 @@ namespace Lab3
             return price;
         }
 
-        private void betaal(UIPayment betaalmiddel, float prijs)
+        private bool betaal(UIPayment betaalmiddel, float prijs)
         {
             IBetaalmiddel fysiekBetaalmiddel = new CreditCard(); // Initialiseer betaalmiddel als CreditCard, anders mogen we geen methodes ervan aanroepen.
             switch (betaalmiddel)
@@ -83,13 +92,36 @@ namespace Lab3
                 case UIPayment.DebitCard:
                     fysiekBetaalmiddel = new DebitCard();
                     break;
+                case UIPayment.Chipknip:
+                    fysiekBetaalmiddel = new Chipknip();
+                    break;
                 case UIPayment.Cash:
                     fysiekBetaalmiddel = new Cash();
                     break;
             }
             fysiekBetaalmiddel.Connect();
             int id = fysiekBetaalmiddel.BeginTransaction(prijs);
-            fysiekBetaalmiddel.EndTransaction(id);
+            // Return True als de betaling succesvol is afgerond.
+            return  fysiekBetaalmiddel.EndTransaction(id);
+        }
+
+        private void printKaartje(Bestelling info)
+        {
+            string klas = "Eerste klas";
+            if(info.Class == UIClass.SecondClass) klas = "Tweede klas";
+
+            string reis = "Enkele reis";
+            if (info.Way == UIWay.Return) reis = "Retour";
+
+            string datum = System.DateTime.Today.ToString("dd/MM/yyyy");
+
+            MessageBox.Show(
+                reis + 
+                "\nVan " + info.From +
+                "\nNaar " + info.To +
+                "\n" + klas +
+                "\nGeldig op: " + datum
+                );
         }
 
         #region Set-up -- don't look at it
@@ -238,7 +270,7 @@ namespace Lab3
 			grid.Controls.Add (paymentLabel, 0, 2);
 			payment = new ComboBox ();
 			payment.DropDownStyle = ComboBoxStyle.DropDownList;
-			payment.Items.AddRange (new String[] { "Credit card", "Debit card", "Cash" });
+			payment.Items.AddRange (new String[] { "Credit card", "Debit card", "Chipknip", "Cash" });
 			payment.SelectedIndex = 0;
 			payment.Dock = DockStyle.Fill;
 			grid.Controls.Add (payment, 1, 2);
@@ -288,6 +320,9 @@ namespace Lab3
 			case "Debit card":
 				pment = UIPayment.DebitCard;
 				break;
+            case "Chipknip":
+                pment = UIPayment.Chipknip;
+                break;
 			default:
 				pment = UIPayment.Cash;
 				break;

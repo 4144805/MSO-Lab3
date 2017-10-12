@@ -25,6 +25,7 @@ namespace Lab3
 	{
 		DebitCard,
 		CreditCard,
+        Chipknip,
 		Cash
 	}
 

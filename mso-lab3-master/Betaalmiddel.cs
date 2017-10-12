@@ -89,10 +89,47 @@ namespace Lab3
         }
     }
 
+    // Mock CreditCard implementation
+    public class Chipknip : IBetaalmiddel
+    {
+        public void Connect()
+        {
+            MessageBox.Show("Verbinden met chipknip");
+        }
+
+        public void Disconnect()
+        {
+            MessageBox.Show("Verbinding met chipkniplezer verbreken");
+        }
+
+        public int BeginTransaction(float amount)
+        {
+            MessageBox.Show("Betaal nu " + amount + " EUR");
+            return 1;
+        }
+
+        public bool EndTransaction(int id)
+        {
+            if (id != 1)
+                return false;
+
+            MessageBox.Show("Beëindig transactie 1");
+            return true;
+        }
+
+        public void CancelTransaction(int id)
+        {
+            if (id != 1)
+                throw new Exception("Verkeerde transactie id (maar we weten niet wat het nut daar van is)");
+
+            MessageBox.Show("Annuleer transactie nummer 1");
+        }
+    }
+
     // Mock Cash implementation
     public class Cash : IBetaalmiddel
     {
-        IKEAMyntAtare2000 muntmachine = new IKEAMyntAtare2000();
+        private IKEAMyntAtare2000 muntmachine = new IKEAMyntAtare2000();
         public void Connect()
         {
             muntmachine.starta();
@@ -105,7 +142,8 @@ namespace Lab3
 
         public int BeginTransaction(float amount)
         {
-            int centen = (int)Math.Floor(amount * 100);
+            amount *= 100;
+            int centen = (int)(amount);
             muntmachine.betala(centen);
             return 1;
         }

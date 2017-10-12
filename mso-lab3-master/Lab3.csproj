@@ -45,7 +45,6 @@
     </Compile>
     <Compile Include="Database.cs" />
     <Compile Include="Bestelling.cs" />
-    <Compile Include="Card.cs" />
     <Compile Include="CoinMachine.cs" />
   </ItemGroup>
   <ItemGroup>
